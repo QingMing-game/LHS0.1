@@ -1,0 +1,597 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0,viewport-fit=cover"/>
+<title>灵画师 · BT2.0版 · 全民内测</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@400;600;700;900&family=ZCOOL+XiaoWei&family=Bebas+Neue&display=swap" rel="stylesheet">
+<style>
+/* ══════════════════════════════
+   CSS 变量 — 墨玉修仙风
+══════════════════════════════ */
+:root{
+  /* 主色：墨玉绿 */
+  --jade:#1A7A62;  --jade2:#28A882;  --jade3:#48CCA0;  --jade4:#80E8C0;
+  /* 金色点缀 */
+  --gold:#B8920A;  --gold2:#D8B030;  --gold3:#F0D060;  --gold4:#FFF0A0;
+  /* 背景深色 */
+  --deep:#04120E;  --deep2:#071C16;  --deep3:#0C2E22;
+  /* 面板/弹窗 */
+  --panel:rgba(4,18,12,0.93);  --modal:rgba(3,13,9,0.96);
+  /* 边框 */
+  --bd:rgba(40,168,130,0.38);  --bd2:rgba(40,168,130,0.2);
+  --bdjd:rgba(184,146,10,0.35);
+  /* 字体 */
+  --ff-d:'Noto Serif SC',serif;
+  --ff-t:'ZCOOL XiaoWei','Noto Serif SC',serif;
+  --ff-b:'Noto Serif SC',serif;
+  --ff-n:'Bebas Neue',monospace;
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+
+/* ══════════════════════════════
+   背景：CSS渐变 + 粒子装饰
+══════════════════════════════ */
+body{
+  margin:0;font-family:var(--ff-b);
+  -webkit-font-smoothing:antialiased;
+  background:var(--deep);
+  overflow-x:hidden;
+}
+
+/* 主背景：深邃墨玉渐变 */
+.bg-canvas{
+  position:fixed;inset:0;z-index:-3;
+  background:
+    radial-gradient(ellipse 80% 60% at 50% 0%,   rgba(26,122,98,.45) 0%,  transparent 70%),
+    radial-gradient(ellipse 60% 40% at 80% 100%,  rgba(20,90,72,.35)  0%,  transparent 60%),
+    radial-gradient(ellipse 40% 50% at 10% 60%,   rgba(10,50,38,.3)   0%,  transparent 60%),
+    linear-gradient(170deg, #060F0C 0%, #041410 30%, #030E0A 60%, #050F0B 100%);
+}
+
+/* 星光粒子层 */
+.bg-stars{
+  position:fixed;inset:0;z-index:-2;
+  background-image:
+    radial-gradient(1px 1px at 15% 18%, rgba(80,220,160,.8) 0%, transparent 100%),
+    radial-gradient(1.5px 1.5px at 35% 8%,  rgba(200,180,60,.7) 0%, transparent 100%),
+    radial-gradient(1px 1px at 55% 22%,  rgba(80,220,160,.6) 0%, transparent 100%),
+    radial-gradient(1px 1px at 72% 12%,  rgba(200,180,60,.5) 0%, transparent 100%),
+    radial-gradient(1px 1px at 88% 28%,  rgba(80,220,160,.7) 0%, transparent 100%),
+    radial-gradient(1px 1px at 8%  42%,  rgba(200,180,60,.4) 0%, transparent 100%),
+    radial-gradient(1px 1px at 92% 55%,  rgba(80,220,160,.5) 0%, transparent 100%),
+    radial-gradient(1.5px 1.5px at 48% 72%, rgba(200,180,60,.6) 0%, transparent 100%),
+    radial-gradient(1px 1px at 25% 85%,  rgba(80,220,160,.4) 0%, transparent 100%),
+    radial-gradient(1px 1px at 68% 90%,  rgba(200,180,60,.5) 0%, transparent 100%),
+    radial-gradient(1px 1px at 82% 78%,  rgba(80,220,160,.6) 0%, transparent 100%),
+    radial-gradient(2px 2px at 42% 45%,  rgba(255,240,120,.3) 0%, transparent 100%),
+    radial-gradient(1px 1px at 62% 38%,  rgba(80,220,160,.35) 0%, transparent 100%),
+    radial-gradient(1px 1px at 18% 62%,  rgba(200,180,60,.4) 0%, transparent 100%),
+    radial-gradient(1px 1px at 78% 48%,  rgba(80,220,160,.3) 0%, transparent 100%);
+  animation:starShift 12s ease-in-out infinite alternate;
+}
+@keyframes starShift{
+  0%{opacity:.7;transform:translateY(0)}
+  100%{opacity:1;transform:translateY(-4px)}
+}
+
+/* 光晕装饰 */
+.bg-glow{
+  position:fixed;inset:0;z-index:-1;
+  background:
+    radial-gradient(ellipse 55% 25% at 50% 0%, rgba(26,122,98,.18) 0%, transparent 100%),
+    radial-gradient(ellipse 30% 30% at 15% 50%, rgba(18,90,70,.12) 0%, transparent 100%),
+    linear-gradient(to bottom, transparent 40%, rgba(4,18,12,.6) 100%);
+}
+
+/* ══════════════════════════════
+   顶部标题
+══════════════════════════════ */
+.top{
+  position:fixed;top:max(16px,env(safe-area-inset-top));
+  left:50%;transform:translateX(-50%);
+  z-index:20;text-align:center;pointer-events:none;width:max-content;
+}
+.top-title{
+  font-family:var(--ff-d);font-weight:900;
+  font-size:clamp(20px,5.5vw,36px);
+  color:var(--jade3);letter-spacing:8px;white-space:nowrap;
+  text-shadow:0 0 30px rgba(72,204,160,.7),0 0 60px rgba(26,122,98,.4),0 2px 0 rgba(0,0,0,.9);
+}
+.top-badge{
+  display:inline-block;margin-left:8px;
+  font-family:var(--ff-t);font-size:clamp(10px,2vw,13px);
+  color:var(--gold3);letter-spacing:2px;
+  background:rgba(184,146,10,.15);border:1px solid rgba(184,146,10,.4);
+  border-radius:4px;padding:1px 8px;vertical-align:middle;
+  text-shadow:0 0 8px rgba(240,208,96,.5);
+}
+.top-rule{display:flex;align-items:center;justify-content:center;gap:10px;margin-top:7px}
+.top-line{height:1px;width:36px;background:linear-gradient(to right,transparent,var(--jade2));opacity:.55}
+.top-line.r{background:linear-gradient(to left,transparent,var(--jade2))}
+.top-sub{font-family:var(--ff-b);font-size:clamp(9px,1.9vw,11px);color:rgba(200,240,225,.42);letter-spacing:6px}
+
+/* ══════════════════════════════
+   中心按钮
+══════════════════════════════ */
+.enter-btn{
+  position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);
+  width:clamp(86px,15vw,124px);height:clamp(86px,15vw,124px);
+  border-radius:50%;
+  background:radial-gradient(circle at 36% 30%,var(--jade3),#0A4030);
+  border:2px solid var(--jade2);
+  outline:1px solid rgba(40,168,130,.25);outline-offset:7px;
+  color:#fff;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;
+  cursor:pointer;z-index:10;user-select:none;
+  animation:breathe 3.2s ease-in-out infinite,gpulse 3.2s infinite;
+}
+.enter-btn .ec{font-family:var(--ff-d);font-weight:900;font-size:clamp(22px,5vw,30px);letter-spacing:5px;line-height:1;text-shadow:0 1px 6px rgba(0,0,0,.7)}
+.enter-btn .es{font-family:var(--ff-b);font-size:10px;letter-spacing:4px;opacity:.58}
+@keyframes breathe{0%,100%{transform:translate(-50%,-50%) scale(1)}50%{transform:translate(-50%,-50%) scale(1.07)}}
+@keyframes gpulse{
+  0%{box-shadow:0 0 0 0 rgba(26,122,98,.65),0 0 0 0 rgba(40,168,130,.2)}
+  70%{box-shadow:0 0 0 28px rgba(26,122,98,0),0 0 0 14px rgba(40,168,130,0)}
+  100%{box-shadow:0 0 0 0 rgba(26,122,98,0),0 0 0 0 rgba(40,168,130,0)}
+}
+.enter-btn.open{animation:none;transform:translate(-50%,-50%) rotate(45deg) scale(1.05);background:radial-gradient(circle,#444,#111)}
+
+/* ══════════════════════════════
+   面板
+══════════════════════════════ */
+.panel{
+  position:fixed;bottom:0;left:0;right:0;z-index:30;
+  max-width:500px;margin:0 auto;
+  background:var(--panel);backdrop-filter:blur(22px);-webkit-backdrop-filter:blur(22px);
+  border:1px solid var(--bd);border-bottom:none;border-radius:24px 24px 0 0;
+  padding:0 0 calc(env(safe-area-inset-bottom));
+  max-height:88vh;overflow-y:auto;-webkit-overflow-scrolling:touch;
+  transform:translateY(100%);transition:transform .45s cubic-bezier(.22,1,.36,1);
+  scrollbar-width:none;
+}
+.panel::-webkit-scrollbar{display:none}
+.panel.show{transform:translateY(0)}
+
+.p-handle{height:28px;display:flex;align-items:center;justify-content:center;cursor:pointer}
+.p-handle::after{content:"";width:40px;height:4px;border-radius:2px;background:linear-gradient(90deg,transparent,var(--jade2),transparent);opacity:.4}
+
+.p-head{padding:2px 22px 18px;text-align:center;border-bottom:1px solid var(--bd2)}
+.p-title{font-family:var(--ff-d);font-weight:700;font-size:clamp(17px,4.2vw,22px);color:var(--jade3);letter-spacing:4px;text-shadow:0 0 18px rgba(72,204,160,.38)}
+.p-sub{font-family:var(--ff-b);font-size:11px;color:rgba(200,240,225,.38);letter-spacing:5px;margin-top:5px}
+
+/* ══════════════════════════════
+   倒计时（面板）
+══════════════════════════════ */
+.p-cd{padding:18px 22px 16px;border-bottom:1px solid var(--bd2)}
+.p-cd-label{font-family:var(--ff-t);font-size:12px;color:rgba(200,240,225,.52);letter-spacing:4px;text-align:center;margin-bottom:14px}
+.cd-row{display:flex;justify-content:center;align-items:flex-start;gap:7px}
+.cd-unit{display:flex;flex-direction:column;align-items:center;gap:6px}
+.cd-box{
+  position:relative;width:clamp(54px,13vw,68px);height:clamp(62px,15vw,78px);
+  border-radius:10px;overflow:hidden;
+  background:linear-gradient(160deg,#0A2A1E,#051408);
+  border:1px solid rgba(40,168,130,.5);
+  box-shadow:0 2px 0 rgba(0,0,0,.6),inset 0 1px 0 rgba(40,168,130,.12),0 0 22px rgba(26,122,98,.28);
+  display:flex;align-items:center;justify-content:center;
+}
+.cd-box::before{content:"";position:absolute;left:0;right:0;top:0;height:50%;background:rgba(255,255,255,.035);z-index:1}
+.cd-box::after{content:"";position:absolute;left:0;right:0;top:50%;height:1px;background:rgba(0,0,0,.5);z-index:2}
+.cd-n{font-family:var(--ff-n);font-size:clamp(32px,8.5vw,44px);color:#fff;letter-spacing:1px;line-height:1;position:relative;z-index:3;text-shadow:0 0 18px rgba(72,204,160,.65),0 2px 4px rgba(0,0,0,.9)}
+.cd-n.flip{animation:flip .18s ease}
+@keyframes flip{0%{transform:scaleY(.8);opacity:.3}100%{transform:scaleY(1);opacity:1}}
+.cd-lbl{font-family:var(--ff-b);font-weight:600;font-size:12px;color:rgba(200,240,225,.48);letter-spacing:3px}
+.cd-sep{font-family:var(--ff-n);font-size:clamp(24px,5.5vw,32px);color:var(--jade3);opacity:.6;margin-top:clamp(12px,3vw,18px);line-height:1;animation:blink 1s step-end infinite}
+@keyframes blink{0%,49%{opacity:.6}50%,100%{opacity:.15}}
+.p-cd-date{font-family:var(--ff-b);font-size:11px;color:rgba(200,240,225,.3);letter-spacing:2px;text-align:center;margin-top:12px}
+.p-cd-date span{color:rgba(216,176,48,.65)}
+
+/* CDK 框 */
+.cdk-box{
+  margin:14px 22px 0;
+  background:linear-gradient(135deg,rgba(184,146,10,.12),rgba(4,18,12,.7));
+  border:1px solid var(--bdjd);border-radius:12px;padding:12px 16px;
+  text-align:center;
+}
+.cdk-title{font-family:var(--ff-t);font-size:12px;color:rgba(216,176,48,.65);letter-spacing:3px;margin-bottom:7px}
+.cdk-code{
+  font-family:var(--ff-n);font-size:22px;color:var(--gold3);
+  letter-spacing:6px;text-shadow:0 0 14px rgba(240,208,96,.6);
+  cursor:pointer;
+}
+.cdk-hint{font-family:var(--ff-b);font-size:10px;color:rgba(216,176,48,.45);letter-spacing:1px;margin-top:5px}
+
+/* 面板信息 */
+.p-info{padding:16px 22px;border-bottom:1px solid var(--bd2)}
+.info-item{display:flex;align-items:flex-start;gap:11px;padding:8px 0;color:rgba(210,245,232,.9);font-size:13px;line-height:1.7;text-align:left}
+.info-item+.info-item{border-top:1px solid rgba(200,240,225,.05)}
+.ib{flex-shrink:0;width:26px;height:26px;border-radius:7px;margin-top:1px;background:linear-gradient(135deg,rgba(26,122,98,.42),rgba(6,40,28,.85));border:1px solid rgba(40,168,130,.48);display:flex;align-items:center;justify-content:center;font-family:var(--ff-t);font-size:12px;font-weight:600;color:var(--jade3);letter-spacing:0}
+.info-item strong{color:var(--jade3);font-weight:700}
+
+/* 按钮区 */
+.p-btns{padding:16px 22px;display:flex;flex-direction:column;gap:10px}
+
+/* ══════════════════════════════
+   公用按钮
+══════════════════════════════ */
+.btn{display:flex;align-items:center;justify-content:center;gap:9px;width:100%;padding:15px 20px;border-radius:11px;font-family:var(--ff-d);font-weight:700;font-size:15px;letter-spacing:4px;cursor:pointer;text-decoration:none;border:none;transition:transform .14s,opacity .14s;-webkit-tap-highlight-color:transparent}
+.btn:active{transform:scale(.97);opacity:.88}
+.btn-jade{background:linear-gradient(135deg,#1A7A62 0%,#0A4A34 100%);color:var(--gold3);border:1px solid rgba(72,204,160,.45);box-shadow:0 4px 18px rgba(26,122,98,.5),inset 0 1px 0 rgba(255,255,255,.08)}
+.btn-gold{background:linear-gradient(135deg,#A07E0A,#6A5006);color:var(--gold4);border:1px solid rgba(216,176,48,.45);box-shadow:0 4px 16px rgba(160,126,10,.45)}
+.btn-ghost{background:rgba(40,168,130,.07);color:rgba(72,204,160,.78);border:1px solid rgba(40,168,130,.28)}
+.bi{width:22px;height:22px;border-radius:6px;background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.16);display:flex;align-items:center;justify-content:center;font-family:var(--ff-t);font-size:11px;flex-shrink:0}
+
+/* ══════════════════════════════
+   弹窗
+══════════════════════════════ */
+#modal{display:none;position:fixed;inset:0;z-index:9999}
+.m-bg{position:absolute;inset:0;z-index:0;
+  background:radial-gradient(ellipse 80% 60% at 50% 0%,rgba(26,122,98,.35) 0%,transparent 70%),
+             radial-gradient(ellipse 60% 50% at 20% 80%,rgba(18,90,70,.3) 0%,transparent 60%),
+             linear-gradient(170deg,#030C08 0%,#040E0A 50%,#030B07 100%);
+  filter:brightness(.95);}
+.m-wrap{position:absolute;inset:0;z-index:1;overflow-y:auto;-webkit-overflow-scrolling:touch;overscroll-behavior:contain;display:flex;align-items:flex-start;justify-content:center;padding:max(18px,env(safe-area-inset-top)) 14px 0;padding-bottom:calc(72px + max(14px,env(safe-area-inset-bottom)))}
+.m-card{position:relative;width:100%;max-width:600px;background:var(--modal);border:1px solid var(--bd);border-radius:18px;overflow:hidden}
+.m-close-x{position:absolute;top:12px;right:12px;width:36px;height:36px;background:rgba(26,122,98,.88);border:1px solid rgba(72,204,160,.5);color:var(--jade4);border-radius:50%;font-size:20px;font-weight:bold;line-height:36px;text-align:center;cursor:pointer;z-index:20;box-shadow:0 2px 8px rgba(0,0,0,.6);transition:background .18s,transform .18s;-webkit-tap-highlight-color:transparent;user-select:none}
+.m-close-x:active{transform:scale(.92);background:var(--jade2)}
+
+/* 关闭条 */
+.m-close-bar{position:fixed;bottom:0;left:0;right:0;z-index:10000;display:none;padding:10px 16px calc(10px + max(10px,env(safe-area-inset-bottom)));background:linear-gradient(to top,rgba(3,12,8,.97) 60%,transparent);pointer-events:none}
+.m-close-bar.visible{display:block;pointer-events:auto}
+.m-close-bar-btn{display:flex;align-items:center;justify-content:center;gap:8px;width:100%;max-width:600px;margin:0 auto;padding:15px;border-radius:12px;background:rgba(26,122,98,.88);border:1px solid rgba(72,204,160,.45);color:var(--jade3);font-family:var(--ff-d);font-weight:700;font-size:15px;letter-spacing:4px;cursor:pointer;box-shadow:0 -2px 20px rgba(0,0,0,.5),0 3px 12px rgba(26,122,98,.35);-webkit-tap-highlight-color:transparent;user-select:none;transition:background .18s,transform .14s}
+.m-close-bar-btn:active{transform:scale(.98);background:var(--jade2)}
+
+/* 弹窗头 */
+.m-head{background:linear-gradient(160deg,rgba(10,60,42,.7) 0%,rgba(3,12,8,.97) 100%);border-bottom:1px solid var(--bd);padding:22px 52px 0 22px}
+.m-head-title{font-family:var(--ff-d);font-weight:900;font-size:clamp(18px,4.5vw,24px);color:var(--jade3);letter-spacing:5px;text-shadow:0 0 22px rgba(72,204,160,.45);text-align:center}
+.m-head-sub{font-family:var(--ff-b);font-size:11px;color:rgba(200,240,225,.4);letter-spacing:3px;text-align:center;margin-top:6px}
+
+/* 弹窗倒计时 */
+.m-cd{padding:20px 20px 18px;border-bottom:1px solid var(--bd2);background:rgba(0,0,0,.18)}
+.m-cd-top{display:flex;align-items:center;justify-content:center;gap:10px;margin-bottom:16px}
+.m-cd-line{flex:1;height:1px;background:linear-gradient(to right,transparent,rgba(26,122,98,.55))}
+.m-cd-line.r{background:linear-gradient(to left,transparent,rgba(26,122,98,.55))}
+.m-cd-tag{font-family:var(--ff-t);font-size:12px;color:rgba(200,240,225,.5);letter-spacing:4px;white-space:nowrap}
+.m-cd-cards{display:flex;justify-content:center;align-items:flex-start;gap:8px}
+.m-cd-unit{display:flex;flex-direction:column;align-items:center;gap:6px}
+.m-cd-box{position:relative;width:clamp(60px,14.5vw,76px);height:clamp(70px,16.5vw,88px);border-radius:10px;overflow:hidden;background:linear-gradient(160deg,#0C2E22,#061408);border:1px solid rgba(40,168,130,.5);box-shadow:0 3px 0 rgba(0,0,0,.6),inset 0 1px 0 rgba(40,168,130,.1),0 0 26px rgba(26,122,98,.25);display:flex;align-items:center;justify-content:center}
+.m-cd-box::before{content:"";position:absolute;left:0;right:0;top:0;height:50%;background:rgba(255,255,255,.04);z-index:1}
+.m-cd-box::after{content:"";position:absolute;left:0;right:0;top:50%;height:1px;background:rgba(0,0,0,.5);z-index:2}
+.m-cd-n{font-family:var(--ff-n);font-size:clamp(36px,9.5vw,52px);color:#fff;letter-spacing:1px;line-height:1;position:relative;z-index:3;text-shadow:0 0 22px rgba(72,204,160,.65),0 2px 6px rgba(0,0,0,.9)}
+.m-cd-n.flip{animation:flip .18s ease}
+.m-cd-lbl{font-family:var(--ff-b);font-weight:600;font-size:clamp(11px,2.2vw,13px);color:rgba(200,240,225,.45);letter-spacing:3px}
+.m-cd-sep{font-family:var(--ff-n);font-size:clamp(28px,6.5vw,40px);color:var(--jade3);opacity:.58;margin-top:clamp(16px,3.8vw,22px);line-height:1;animation:blink 1s step-end infinite}
+.m-cd-date{font-family:var(--ff-b);font-size:11px;color:rgba(200,240,225,.3);letter-spacing:2px;text-align:center;margin-top:13px}
+.m-cd-date span{color:rgba(216,176,48,.62)}
+
+/* ended */
+.cd-ended .m-cd-box,.cd-ended .cd-box{border-color:rgba(240,208,96,.5);box-shadow:0 0 22px rgba(240,208,96,.25)}
+.cd-ended .m-cd-n,.cd-ended .cd-n{color:var(--gold3);text-shadow:0 0 18px rgba(240,208,96,.6)}
+.cd-ended .m-cd-tag,.cd-ended .p-cd-label{color:rgba(240,208,96,.8)}
+
+/* 弹窗正文 */
+.m-body{padding:20px 18px}
+.sec{margin-bottom:22px}
+.sec-hd{display:flex;align-items:center;gap:11px;margin-bottom:12px;padding-bottom:9px;border-bottom:1px solid var(--bd2)}
+.sec-icon{flex-shrink:0;width:28px;height:28px;border-radius:7px;background:linear-gradient(135deg,rgba(26,122,98,.55),rgba(6,40,28,.9));border:1px solid rgba(40,168,130,.48);display:flex;align-items:center;justify-content:center;font-family:var(--ff-t);font-size:13px;font-weight:600;color:var(--jade3);box-shadow:0 0 9px rgba(26,122,98,.28)}
+.sec-name{font-family:var(--ff-d);font-weight:700;font-size:15px;color:var(--jade3);letter-spacing:3px}
+.sec-tag{margin-left:auto;font-family:var(--ff-b);font-size:10px;color:rgba(200,240,225,.3);letter-spacing:1px;border:1px solid var(--bd2);border-radius:4px;padding:1px 7px}
+
+/* CDK 大展示区 */
+.cdk-display{
+  background:linear-gradient(135deg,rgba(184,146,10,.15),rgba(4,18,12,.8));
+  border:1px solid rgba(184,146,10,.45);border-radius:14px;padding:18px;
+  text-align:center;position:relative;overflow:hidden;
+}
+.cdk-display::before{
+  content:"";position:absolute;inset:0;
+  background:radial-gradient(ellipse 60% 40% at 50% 0%,rgba(216,176,48,.08),transparent);
+  pointer-events:none;
+}
+.cdk-big{font-family:var(--ff-n);font-size:clamp(28px,7vw,40px);color:var(--gold3);letter-spacing:10px;text-shadow:0 0 20px rgba(240,208,96,.7);margin-bottom:6px}
+.cdk-copy-hint{font-family:var(--ff-b);font-size:11px;color:rgba(216,176,48,.5);letter-spacing:2px;margin-bottom:14px}
+.cdk-rewards{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:12px}
+.cdk-reward-item{
+  background:rgba(26,122,98,.1);border:1px solid rgba(40,168,130,.2);
+  border-radius:9px;padding:10px;text-align:center;
+}
+.rew-val{font-family:var(--ff-n);font-size:20px;color:var(--jade3);line-height:1}
+.rew-name{font-family:var(--ff-b);font-size:11px;color:rgba(200,240,225,.45);margin-top:3px}
+
+/* 高亮卡片 */
+.hc{background:linear-gradient(135deg,rgba(15,80,55,.22),rgba(4,18,12,.6));border:1px solid rgba(40,168,130,.28);border-radius:11px;padding:14px 16px;display:flex;flex-direction:column;gap:8px}
+.hc-row{display:flex;align-items:flex-start;gap:10px;font-family:var(--ff-b);font-size:13px;color:rgba(210,245,232,.88);line-height:1.68}
+.hc-dot{width:6px;height:6px;border-radius:50%;background:var(--jade2);flex-shrink:0;margin-top:7px;box-shadow:0 0 6px rgba(40,168,130,.6)}
+.hc-row strong{color:var(--jade3);font-weight:700}
+
+/* 数值格 */
+.stat-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:7px}
+.stat-cell{background:rgba(26,122,98,.07);border:1px solid var(--bd2);border-radius:9px;padding:11px 6px;text-align:center}
+.stat-v{font-family:var(--ff-n);font-size:26px;color:var(--jade3);line-height:1}
+.stat-k{font-family:var(--ff-b);font-size:10px;color:rgba(200,240,225,.44);margin-top:4px;letter-spacing:1px}
+
+/* 说明框 */
+.note{background:rgba(26,122,98,.1);border:1px solid rgba(40,168,130,.22);border-radius:9px;padding:11px 14px;margin-top:9px;font-family:var(--ff-b);font-size:12px;color:rgba(200,240,225,.65);line-height:1.9}
+
+/* 列表 */
+.ilist{list-style:none;display:flex;flex-direction:column;gap:8px}
+.ilist li{display:flex;gap:10px;font-family:var(--ff-b);font-size:13px;color:rgba(210,245,232,.88);line-height:1.72}
+.ilist li strong{color:var(--jade3);font-weight:700}
+.li-n{flex-shrink:0;width:21px;height:21px;border-radius:50%;margin-top:2px;background:rgba(26,122,98,.3);border:1px solid rgba(40,168,130,.3);display:flex;align-items:center;justify-content:center;font-family:var(--ff-n);font-size:12px;color:var(--jade3)}
+
+/* 表格 */
+.rt{width:100%;border-collapse:collapse;margin-top:8px}
+.rt th{font-family:var(--ff-d);font-weight:700;font-size:13px;background:rgba(26,122,98,.1);color:rgba(72,204,160,.78);letter-spacing:2px;padding:9px 11px;text-align:left;border-bottom:1px solid var(--bd2)}
+.rt td{font-family:var(--ff-b);font-size:13px;padding:9px 11px;border-bottom:1px solid rgba(255,255,255,.04);color:rgba(210,245,232,.75)}
+.rt tr:last-child td{border-bottom:none}
+.rt tr:hover td{background:rgba(255,255,255,.025)}
+.tdg{font-family:var(--ff-d) !important;font-weight:700 !important;color:var(--jade3) !important}
+.tdgold{font-family:var(--ff-d) !important;font-weight:700 !important;color:var(--gold3) !important}
+
+/* 弹窗底部 */
+.m-foot{padding:14px 18px calc(14px + env(safe-area-inset-bottom));border-top:1px solid var(--bd);display:flex;flex-direction:column;gap:10px}
+
+/* PC */
+@media(min-width:768px){
+  .panel{left:auto;right:40px;bottom:40px;border-radius:18px;border:1px solid var(--bd);max-height:84vh}
+}
+@media(max-width:767px){
+  .panel{border-radius:24px 24px 0 0;border-bottom:none}
+}
+</style>
+</head>
+<body>
+
+<div class="bg-canvas"></div>
+<div class="bg-stars"></div>
+<div class="bg-glow"></div>
+
+<!-- 顶部标题 -->
+<div class="top">
+  <div class="top-title">灵画师<span class="top-badge">BT2.0</span></div>
+  <div class="top-rule">
+    <div class="top-line"></div>
+    <span class="top-sub">IMMORTAL CULTIVATION · SPECIAL SERVER</span>
+    <div class="top-line r"></div>
+  </div>
+</div>
+
+<!-- 进入按钮 -->
+<div class="enter-btn" id="enterBtn" onclick="togglePanel()">
+  <span class="ec">进入</span>
+  <span class="es">ENTER</span>
+</div>
+
+<!-- ═══════ 面板 ═══════ -->
+<div class="panel" id="panel">
+  <div class="p-handle" onclick="togglePanel()"></div>
+
+  <div class="p-head">
+    <div class="p-title">灵画师 · BT2.0全民内测</div>
+    <div class="p-sub">古风修仙 · 御兽驯妖 · 极速养成</div>
+  </div>
+
+  <!-- 倒计时 -->
+  <div class="p-cd">
+    <div class="p-cd-label" id="pLabel">距全民内测开启还有</div>
+    <div class="cd-row">
+      <div class="cd-unit"><div class="cd-box"><span class="cd-n" id="p-d">--</span></div><span class="cd-lbl">天</span></div>
+      <div class="cd-sep">:</div>
+      <div class="cd-unit"><div class="cd-box"><span class="cd-n" id="p-h">--</span></div><span class="cd-lbl">时</span></div>
+      <div class="cd-sep">:</div>
+      <div class="cd-unit"><div class="cd-box"><span class="cd-n" id="p-m">--</span></div><span class="cd-lbl">分</span></div>
+      <div class="cd-sep">:</div>
+      <div class="cd-unit"><div class="cd-box"><span class="cd-n" id="p-s">--</span></div><span class="cd-lbl">秒</span></div>
+    </div>
+    <div class="p-cd-date">全民内测时间 <span>2026年5月1日 16:00（北京时间）</span></div>
+  </div>
+
+  <!-- CDK 简要展示 -->
+  <div class="cdk-box">
+    <div class="cdk-title">◆ 内测专属激活码 ◆</div>
+    <div class="cdk-code" onclick="copyCDK(this)" title="点击复制">LHSNC</div>
+    <div class="cdk-hint">进入游戏后在「福利中心」输入CDK即可领取</div>
+  </div>
+
+  <!-- 核心福利 -->
+  <div class="p-info">
+    <div class="info-item"><span class="ib">券</span><span>代金券 <strong>×100万</strong>，畅买全服顶级装备道具</span></div>
+    <div class="info-item"><span class="ib">令</span><span>天衍令 <strong>×100万</strong>，解锁高阶修炼与秘境</span></div>
+    <div class="info-item"><span class="ib">宝</span><span>元宝 <strong>×100万</strong>，BT福利直接起飞</span></div>
+    <div class="info-item"><span class="ib">食</span><span>包子 <strong>×100万</strong>，体力无限永不断线</span></div>
+  </div>
+
+  <!-- 按钮 -->
+  <div class="p-btns">
+    <a class="btn btn-jade" href="https://qun.qq.com/universal-share/share?ac=1&authKey=FX8OMeXRE0BkvadIKcar4LIiEmi%2BthlfbiY38gtcY5erfnGZ5YHrU%2B%2FQzTV4LY7w&busi_data=eyJncm91cENvZGUiOiI3NjEzODE2MjEiLCJ0b2tlbiI6ImVMY3ptNDNtdlBQRlNqbEcwbTdCSWtidUs0L2c3N1VTaFpoYVdrWW1Rd3VoM3FzanYzMWsyTDc3cUo2d0ZkZXMiLCJ1aW4iOiIzMjQ2NzQ1NTk3In0%3D&data=zQgpWVxrBxZGoHhlM4nSYAfCyzzkX6tPYv2gBteV5yBoE0h3I-i7qjIf4o_BZuYJ06RqffuQWbYjDTAdffxoyg&svctype=4&tempid=h5_group_info" target="_blank"><span class="bi">载</span><span>立即预约下载</span></a>
+    <a class="btn btn-gold" href="https://qun.qq.com/universal-share/share?ac=1&authKey=FX8OMeXRE0BkvadIKcar4LIiEmi%2BthlfbiY38gtcY5erfnGZ5YHrU%2B%2FQzTV4LY7w&busi_data=eyJncm91cENvZGUiOiI3NjEzODE2MjEiLCJ0b2tlbiI6ImVMY3ptNDNtdlBQRlNqbEcwbTdCSWtidUs0L2c3N1VTaFpoYVdrWW1Rd3VoM3FzanYzMWsyTDc3cUo2d0ZkZXMiLCJ1aW4iOiIzMjQ2NzQ1NTk3In0%3D&data=zQgpWVxrBxZGoHhlM4nSYAfCyzzkX6tPYv2gBteV5yBoE0h3I-i7qjIf4o_BZuYJ06RqffuQWbYjDTAdffxoyg&svctype=4&tempid=h5_group_info" target="_blank"><span class="bi">群</span><span>加入仙友交流群</span></a>
+    <button class="btn btn-ghost" onclick="openModal()"><span class="bi">详</span><span>查看完整内测福利</span></button>
+  </div>
+</div>
+
+<!-- ═══════ 弹窗 ═══════ -->
+<div id="modal">
+  <div class="m-bg"></div>
+  <div class="m-wrap">
+    <div class="m-card">
+      <div class="m-close-x" onclick="closeModal()">×</div>
+
+      <div class="m-head">
+        <div class="m-head-title">灵画师 · BT2.0全民内测</div>
+        <div class="m-head-sub">古风修仙 RPG · 御兽驯妖 · 2026年5月1日 16:00 全民开测</div>
+
+        <!-- 弹窗倒计时 -->
+        <div class="m-cd">
+          <div class="m-cd-top">
+            <div class="m-cd-line"></div>
+            <span class="m-cd-tag" id="mLabel">距全民内测还有</span>
+            <div class="m-cd-line r"></div>
+          </div>
+          <div class="m-cd-cards">
+            <div class="m-cd-unit"><div class="m-cd-box"><span class="m-cd-n" id="m-d">--</span></div><span class="m-cd-lbl">天</span></div>
+            <div class="m-cd-sep">:</div>
+            <div class="m-cd-unit"><div class="m-cd-box"><span class="m-cd-n" id="m-h">--</span></div><span class="m-cd-lbl">时</span></div>
+            <div class="m-cd-sep">:</div>
+            <div class="m-cd-unit"><div class="m-cd-box"><span class="m-cd-n" id="m-m">--</span></div><span class="m-cd-lbl">分</span></div>
+            <div class="m-cd-sep">:</div>
+            <div class="m-cd-unit"><div class="m-cd-box"><span class="m-cd-n" id="m-s">--</span></div><span class="m-cd-lbl">秒</span></div>
+          </div>
+          <div class="m-cd-date">内测开启 <span>2026年5月1日 16:00 · 北京时间</span></div>
+        </div>
+      </div>
+
+      <div class="m-body">
+
+        <!-- CDK大展示 -->
+        <div class="sec">
+          <div class="sec-hd"><div class="sec-icon">码</div><span class="sec-name">内测专属激活码</span><span class="sec-tag">输入即领</span></div>
+          <div class="cdk-display">
+            <div class="cdk-big" onclick="copyCDK(this)" title="点击复制">LHSNC</div>
+            <div class="cdk-copy-hint">进入游戏 → 福利中心 → 输入CDK → 一键领取</div>
+            <div class="cdk-rewards">
+              <div class="cdk-reward-item"><div class="rew-val">100万</div><div class="rew-name">代金券</div></div>
+              <div class="cdk-reward-item"><div class="rew-val">100万</div><div class="rew-name">天衍令</div></div>
+              <div class="cdk-reward-item"><div class="rew-val">100万</div><div class="rew-name">元宝</div></div>
+              <div class="cdk-reward-item"><div class="rew-val">100万</div><div class="rew-name">包子</div></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- 游戏介绍 -->
+        <div class="sec">
+          <div class="sec-hd"><div class="sec-icon">仙</div><span class="sec-name">游戏特色</span></div>
+          <div class="hc">
+            <div class="hc-row"><div class="hc-dot"></div><span><strong>古风修仙养成 RPG</strong> —— 扮演天选者，在未知世界披荆斩棘</span></div>
+            <div class="hc-row"><div class="hc-dot"></div><span><strong>御兽驯妖系统</strong> —— 收服各路妖兽，打造专属战宠</span></div>
+            <div class="hc-row"><div class="hc-dot"></div><span><strong>仙盟社交</strong> —— 加入仙盟，广结天下仙友同行</span></div>
+            <div class="hc-row"><div class="hc-dot"></div><span><strong>御剑飞行</strong> —— 孤身闯荡秘境，探秘远古剑冢</span></div>
+            <div class="hc-row"><div class="hc-dot"></div><span><strong>灵田种植</strong> —— 培育珍稀宝药，丰富养成玩法</span></div>
+          </div>
+        </div>
+
+        <!-- BT福利 -->
+        <div class="sec">
+          <div class="sec-hd"><div class="sec-icon">福</div><span class="sec-name">BT2.0专属福利</span><span class="sec-tag">全民内测限定</span></div>
+          <div class="stat-grid">
+            <div class="stat-cell"><div class="stat-v">100万</div><div class="stat-k">代金券</div></div>
+            <div class="stat-cell"><div class="stat-v">100万</div><div class="stat-k">天衍令</div></div>
+            <div class="stat-cell"><div class="stat-v">100万</div><div class="stat-k">元宝</div></div>
+          </div>
+          <div class="stat-grid" style="margin-top:7px;grid-template-columns:1fr 1fr">
+            <div class="stat-cell"><div class="stat-v">100万</div><div class="stat-k">包子</div></div>
+            <div class="stat-cell"><div class="stat-v">BT</div><div class="stat-k">极速养成</div></div>
+          </div>
+          <div class="note">BT版本资源全面开放 · 快速体验完整游戏内容 · 体力充足随时修炼不断线</div>
+        </div>
+
+        <!-- 内测活动 -->
+        <div class="sec">
+          <div class="sec-hd"><div class="sec-icon">活</div><span class="sec-name">全民内测活动</span></div>
+          <ul class="ilist">
+            <li><div class="li-n">1</div><span>输入CDK「LHSNC」即领 <strong>代金券/天衍令/元宝/包子各100万</strong></span></li>
+            <li><div class="li-n">2</div><span>内测期间首充任意金额，额外赠送<strong>专属内测仙缘称号</strong></span></li>
+            <li><div class="li-n">3</div><span>每日登录签到，领取<strong>修炼资源大礼包</strong>（连续7天翻倍）</span></li>
+            <li><div class="li-n">4</div><span>仙盟首占据点，<strong>全盟共享稀有材料奖励</strong></span></li>
+            <li><div class="li-n">5</div><span>御兽活动排行榜，前10名送<strong>绝版坐骑皮肤</strong></span></li>
+            <li><div class="li-n">6</div><span>每日秘境挑战额外奖励，<strong>掉落倍率全面提升</strong></span></li>
+          </ul>
+          <div class="note" style="margin-top:10px">常驻活动：每日签到 · 在线礼包 · 仙盟任务 · 离线修炼收益</div>
+        </div>
+
+        <!-- 充值比例 -->
+        <div class="sec">
+          <div class="sec-hd"><div class="sec-icon">值</div><span class="sec-name">充值优惠说明</span><span class="sec-tag">BT专属折扣</span></div>
+          <div class="hc">
+            <div class="hc-row"><div class="hc-dot"></div><span>本服为 <strong>BT福利版本</strong>，充值金额享受超值折扣，同等花费可获得更多游戏资源</span></div>
+            <div class="hc-row"><div class="hc-dot"></div><span>最低 <strong>6元起充</strong>，按需充值，量力而行</span></div>
+            <div class="hc-row"><div class="hc-dot"></div><span>充值 <strong>328元</strong> 可获得 <strong>3,280元</strong> 等值资源，超值之选</span></div>
+            <div class="hc-row"><div class="hc-dot"></div><span><strong>首充双倍</strong> —— 首次充值任意金额额外赠送等额资源，限一次</span></div>
+          </div>
+          <div class="note" style="margin-top:9px">以上为本服独立福利政策，具体到账以游戏内实际显示为准</div>
+        </div>
+
+        <!-- 版本说明 -->
+        <div class="sec">
+          <div class="sec-hd"><div class="sec-icon">版</div><span class="sec-name">关于BT2.0版本</span></div>
+          <div class="hc">
+            <div class="hc-row"><div class="hc-dot"></div><span><strong>同步官服最新版本</strong> —— 所有新内容第一时间上线</span></div>
+            <div class="hc-row"><div class="hc-dot"></div><span><strong>资源全面开放</strong> —— 极速体验全部游戏内容</span></div>
+            <div class="hc-row"><div class="hc-dot"></div><span><strong>公平竞技环境</strong> —— 严禁外挂与违规，永久封禁</span></div>
+            <div class="hc-row"><div class="hc-dot"></div><span><strong>稳定长久运营</strong> —— 专业团队保障，24h在线秒回应</span></div>
+          </div>
+        </div>
+
+      </div><!-- /m-body -->
+
+      <div class="m-foot">
+        <a class="btn btn-jade" href="https://qun.qq.com/universal-share/share?ac=1&authKey=FX8OMeXRE0BkvadIKcar4LIiEmi%2BthlfbiY38gtcY5erfnGZ5YHrU%2B%2FQzTV4LY7w&busi_data=eyJncm91cENvZGUiOiI3NjEzODE2MjEiLCJ0b2tlbiI6ImVMY3ptNDNtdlBQRlNqbEcwbTdCSWtidUs0L2c3N1VTaFpoYVdrWW1Rd3VoM3FzanYzMWsyTDc3cUo2d0ZkZXMiLCJ1aW4iOiIzMjQ2NzQ1NTk3In0%3D&data=zQgpWVxrBxZGoHhlM4nSYAfCyzzkX6tPYv2gBteV5yBoE0h3I-i7qjIf4o_BZuYJ06RqffuQWbYjDTAdffxoyg&svctype=4&tempid=h5_group_info" target="_blank" style="max-width:100%"><span class="bi">载</span><span>立即预约下载</span></a>
+        <a class="btn btn-gold" href="https://qun.qq.com/universal-share/share?ac=1&authKey=FX8OMeXRE0BkvadIKcar4LIiEmi%2BthlfbiY38gtcY5erfnGZ5YHrU%2B%2FQzTV4LY7w&busi_data=eyJncm91cENvZGUiOiI3NjEzODE2MjEiLCJ0b2tlbiI6ImVMY3ptNDNtdlBQRlNqbEcwbTdCSWtidUs0L2c3N1VTaFpoYVdrWW1Rd3VoM3FzanYzMWsyTDc3cUo2d0ZkZXMiLCJ1aW4iOiIzMjQ2NzQ1NTk3In0%3D&data=zQgpWVxrBxZGoHhlM4nSYAfCyzzkX6tPYv2gBteV5yBoE0h3I-i7qjIf4o_BZuYJ06RqffuQWbYjDTAdffxoyg&svctype=4&tempid=h5_group_info" target="_blank" style="max-width:100%"><span class="bi">群</span><span>加入仙友交流群</span></a>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- 底部关闭条 -->
+<div class="m-close-bar" id="closeBar">
+  <div class="m-close-bar-btn" onclick="closeModal()"><span style="font-size:16px">✕</span><span>关闭内测公告</span></div>
+</div>
+
+<script>
+function togglePanel(){
+  document.getElementById('panel').classList.toggle('show');
+  document.getElementById('enterBtn').classList.toggle('open');
+}
+function openModal(){
+  document.getElementById('modal').style.display='block';
+  document.getElementById('closeBar').classList.add('visible');
+  document.body.style.position='fixed';
+  document.body.style.width='100%';
+  document.body.style.overflow='hidden';
+}
+function closeModal(){
+  document.getElementById('modal').style.display='none';
+  document.getElementById('closeBar').classList.remove('visible');
+  document.body.style.position='';
+  document.body.style.width='';
+  document.body.style.overflow='';
+}
+document.getElementById('modal').addEventListener('click',function(e){if(e.target===this)closeModal()});
+
+function copyCDK(el){
+  const txt='LHSNC';
+  if(navigator.clipboard){
+    navigator.clipboard.writeText(txt).then(()=>{
+      const orig=el.textContent;
+      el.textContent='已复制！';
+      el.style.color='#80E8C0';
+      setTimeout(()=>{el.textContent=orig;el.style.color='';},1500);
+    });
+  }
+}
+
+/* 倒计时：2026-05-01 00:00:00 北京时间 */
+const TARGET=new Date('2026-05-01T16:00:00+08:00').getTime();
+const P={d:document.getElementById('p-d'),h:document.getElementById('p-h'),m:document.getElementById('p-m'),s:document.getElementById('p-s')};
+const M={d:document.getElementById('m-d'),h:document.getElementById('m-h'),m:document.getElementById('m-m'),s:document.getElementById('m-s')};
+function pad(n){return String(n).padStart(2,'0')}
+function setEl(el,val){if(!el||el.textContent===val)return;el.classList.remove('flip');void el.offsetWidth;el.textContent=val;el.classList.add('flip')}
+let ended=false;
+function tick(){
+  const diff=TARGET-Date.now();
+  if(diff<=0&&!ended){
+    ended=true;
+    document.getElementById('pLabel').textContent='全民内测已正式开启！';
+    document.querySelector('.p-cd').classList.add('cd-ended');
+    document.getElementById('mLabel').textContent='全民内测已正式开启！';
+    document.querySelector('.m-cd').classList.add('cd-ended');
+    ['d','h','m','s'].forEach(k=>{setEl(P[k],'00');setEl(M[k],'00')});
+    clearInterval(timer);return;
+  }
+  if(ended)return;
+  const v={d:pad(Math.floor(diff/86400000)),h:pad(Math.floor((diff%86400000)/3600000)),m:pad(Math.floor((diff%3600000)/60000)),s:pad(Math.floor((diff%60000)/1000))};
+  ['d','h','m','s'].forEach(k=>{setEl(P[k],v[k]);setEl(M[k],v[k])});
+}
+tick();const timer=setInterval(tick,1000);
+setTimeout(openModal,1800);
+</script>
+</body>
+</html>
